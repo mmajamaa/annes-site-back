@@ -1,11 +1,6 @@
 const helpers = require("./helpers/index");
 const Image = require("../models/images");
 const Gallery = require("../models/gallerys");
-let config = "";
-
-if (process.env.NODE_ENV !== "production") {
-  config = require("../config.json");
-}
 
 module.exports = {
   index: async (req, res, next) => {

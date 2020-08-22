@@ -3,14 +3,10 @@ const multer = require("multer");
 const multerS3 = require("multer-s3");
 
 const helpers = require("../controllers/helpers");
-let config = "";
 
-if (process.env.NODE_ENV !== "production") {
-  config = require("../config.json");
-}
 aws.config.update({
-  secretAccessKey: process.env.AWS_SECRET_ACCESS || config.AWS_SECRET_ACCESS,
-  accessKeyId: process.env.AWS_ACCESS_KEY || config.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS,
+  accessKeyId: process.env.AWS_ACCESS_KEY,
   region: "us-east-2",
 });
 
@@ -29,7 +25,7 @@ const upload = multer({
   fileFilter,
   storage: multerS3({
     s3,
-    bucket: "annes-gallery",
+    bucket: process.env.BUCKET,
     acl: "public-read",
     metadata: function (req, file, cb) {
       cb(null, { fieldName: "TESTING" });
@@ -50,7 +46,7 @@ const singleUpload = (req, res, next) => {
 
   const key = Date.now().toString();
   let production = process.env.NODE_ENV === "production";
-  let bucket = process.env.BUCKET || config.BUCKET;
+  let bucket = process.env.BUCKET;
 
   var data = {
     Bucket: bucket,
@@ -84,7 +80,7 @@ const singleUpload = (req, res, next) => {
 const deleteImage = (file) => {
   s3.deleteObject(
     {
-      Bucket: "annes-gallery",
+      Bucket: process.env.BUCKET,
       Key: file,
     },
     (error, data) => {
@@ -96,7 +92,7 @@ const deleteImage = (file) => {
 const deleteImages = (files) => {
   s3.deleteObjects(
     {
-      Bucket: "annes-gallery",
+      Bucket: process.env.BUCKET,
       Delete: {
         Objects: files,
       },

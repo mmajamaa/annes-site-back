@@ -1,15 +1,12 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
-
 const app = express();
-
-let config = { db_uri: "" };
-
-if (process.env.NODE_ENV !== "production") {
-  config = require("./config.json");
-}
 
 function requireHTTPS(req, res, next) {
   if (process.env.NODE_ENV !== "production") {
@@ -33,7 +30,7 @@ const apiRoutes = require("./routes/api");
 
 // mongoose
 const mongoose = require("mongoose");
-let mongoDB = process.env.MONGODB_URI || config.db_uri;
+let mongoDB = process.env.MONGODB_URI;
 mongoose.connect(
   mongoDB,
   { useNewUrlParser: true, useUnifiedTopology: true },

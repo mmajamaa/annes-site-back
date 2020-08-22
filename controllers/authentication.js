@@ -3,12 +3,6 @@ const jwt = require("jsonwebtoken");
 const helpers = require("./helpers");
 const User = require("../models/users");
 
-let config = { secret: "" };
-
-if (process.env.NODE_ENV !== "production") {
-  config = require("../config.json");
-}
-
 module.exports = {
   index: async (req, res, next) => {
     const username = req.body.username;
@@ -21,13 +15,9 @@ module.exports = {
       if (doc) {
         if (doc.isValid(password)) {
           // generate token
-          let token = jwt.sign(
-            { username },
-            process.env.secret || config.secret,
-            {
-              expiresIn: "3d",
-            }
-          );
+          let token = jwt.sign({ username }, process.env.SECRET, {
+            expiresIn: "3d",
+          });
           console.log("succesful login");
           return res.status(200).json({ username, token });
         } else {
