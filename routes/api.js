@@ -18,10 +18,6 @@ router
   .post(helpers.verifyToken, singleUpload, ImagesController.newImage);
 
 router
-  .route("/images/")
-  .post(helpers.verifyToken, singleUpload, ImagesController.newImageNoGallery);
-
-router
   .route("/image/:id")
   .delete(helpers.verifyToken, ImagesController.deleteImage);
 

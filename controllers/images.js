@@ -45,30 +45,6 @@ module.exports = {
     }
   },
 
-  newImageNoGallery: async (req, res, next) => {
-    try {
-      const img = await Image.findOne().sort("-so");
-
-      // create new image
-      const newImage = new Image({
-        Key: res.locals.key, // TODO: remove?
-        url: res.locals.url,
-        alt_fi: res.locals.alt_fi,
-        alt_en: res.locals.alt_en,
-        so: img ? img.so + 1 : 0,
-      });
-
-      await newImage.save();
-      // push new image to gallery
-
-      res.status(201).json(newImage);
-    } catch (error) {
-      return res
-        .status(501)
-        .json({ message: "Error on saving record to database." });
-    }
-  },
-
   deleteImage: async (req, res, next) => {
     try {
       const image = await Image.findOne({ _id: req.params.id });
