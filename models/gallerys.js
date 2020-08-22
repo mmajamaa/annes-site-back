@@ -1,34 +1,34 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const Image = require('./images');
+const Image = require("./images");
+const { deleteImages } = require("../services/images");
 
 let schema = new Schema({
-  en: { type: String, require: true, unique: true }, // also used as a path
+  en: { type: String, require: true, unique: true },
   fi: { type: String, require: true, unique: true },
   so: { type: Number, require: true },
-  images: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Image'
-  }]
+  images: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Image",
+    },
+  ],
 });
 
-schema.pre('remove', async function (next) {
+schema.pre("remove", async function (next) {
   try {
-    const imageIds = this.images.map(image => image._id);
-
-    // get gallery's images
-    const images = await Image.find({
-      "_id": {
-        $in: imageIds
-      }
+    const imageIds = this.images.map((image) => image._id);
+    const images = await Image.find({ _id: imageIds });
+    const imgKeyObjs = images.map((img) => {
+      return { Key: img.Key };
     });
 
-    // remove gallery's images
-    for (let i = 0; i < images.length; i++) {
-      await images[i].remove();
-    }
+    await Image.deleteMany({
+      _id: imageIds,
+    });
 
+    await deleteImages(imgKeyObjs);
     next();
   } catch (err) {
     console.log(err);
@@ -36,4 +36,4 @@ schema.pre('remove', async function (next) {
   }
 });
 
-module.exports = mongoose.model('Gallery', schema);
+module.exports = mongoose.model("Gallery", schema);
