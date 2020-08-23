@@ -14,4 +14,6 @@ router
   .route("/:id")
   .delete(helpers.verifyAdmin, galleryController.deleteGallery);
 
+router.route("/publish").post(helpers.verifyAdmin, galleryController.publish);
+
 module.exports = router;

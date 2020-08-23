@@ -23,8 +23,6 @@ module.exports = {
       });
 
       let doc = await newGallery.save();
-      let docs = await Gallery.find().sort({ so: 0 }).populate("images");
-      helpers.uploadSubGalleryJson(docs);
       return res.status(201).json(doc);
     } catch (error) {
       return res.status(501).json({ message: "Error creating gallery." });
@@ -35,8 +33,6 @@ module.exports = {
     try {
       const gallery = await Gallery.findOne({ _id: req.params.id });
       await gallery.remove();
-      let docs = await Gallery.find().sort({ so: 0 }).populate("images");
-      helpers.uploadSubGalleryJson(docs);
       return res.status(200).json(gallery);
     } catch (error) {
       return res.status(501).json({ message: "Error deleting gallery." });
@@ -70,10 +66,22 @@ module.exports = {
         }
       }
       let docs = await Gallery.find().sort({ so: 0 }).populate("images");
-      helpers.uploadSubGalleryJson(docs);
       return res.status(201).json(docs);
     } catch (error) {
       return res.status(501).json({ message: "Error updating changes." });
+    }
+  },
+
+  publish: async (req, res, next) => {
+    try {
+      const docs = await Gallery.find().sort({ so: 0 }).populate("images");
+      await helpers.uploadSubGalleryJson(docs);
+      return res.status(201).json({ message: "Sub gallery changes published" });
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(501)
+        .json({ message: "Error publishing sub gallery changes." });
     }
   },
 };
