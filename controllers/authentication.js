@@ -7,11 +7,11 @@ module.exports = {
   index: async (req, res, next) => {
     const username = req.body.username;
     const password = req.body.password;
-    let doc = await User.findOne({ username }).exec();
 
     console.log("login");
 
     try {
+      let doc = await User.findOne({ username }).exec();
       if (doc) {
         if (doc.isValid(password)) {
           // generate token
@@ -41,9 +41,8 @@ module.exports = {
       password: User.hashPassword(req.body.password),
     });
 
-    let doc = await user.save();
-
     try {
+      let doc = await user.save();
       return res.status(201).json(doc);
     } catch (error) {
       return res.status(501).json({ message: "Error registering user." });

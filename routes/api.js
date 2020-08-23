@@ -32,7 +32,7 @@ router
 router
   .route("/gallerys")
   .get(GallerysController.index)
-  .post(helpers.verifyToken, GallerysController.newGallery);
+  .post(helpers.verifyToken, GallerysController.postGallery);
 
 router
   .route("/gallery/:id")

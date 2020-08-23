@@ -4,16 +4,15 @@ const Gallery = require("../models/gallerys");
 
 module.exports = {
   index: async (req, res, next) => {
-    let docs = await Gallery.find().sort({ so: 0 }).populate("images");
-
     try {
+      let docs = await Gallery.find().sort({ so: 0 }).populate("images");
       return res.status(200).json(docs);
     } catch (error) {
       return res.status(501).json({ message: "Error getting gallerys." });
     }
   },
 
-  newGallery: async (req, res, next) => {
+  postGallery: async (req, res, next) => {
     try {
       const gallery = await Gallery.findOne().sort("-so");
 
@@ -46,36 +45,26 @@ module.exports = {
 
   updateGalleries: async (req, res, next) => {
     try {
-      // iterate through subgalleries
       for (let i = 0; i < req.body.subGalleries.length; i++) {
-        // update subgallery
-        const gallery = await Gallery.findOne({
-          _id: req.body.subGalleries[i]._id,
-        });
-
-        gallery.images = req.body.subGalleries[i].images;
-        gallery.fi = req.body.subGalleries[i].fi;
-        gallery.en = req.body.subGalleries[i].en;
-        gallery.so = req.body.subGalleries[i].so;
-
-        await gallery.save();
-
-        // iterate through subgallery's images
+        await Gallery.update(
+          {
+            _id: req.body.subGalleries[i]._id,
+          },
+          {
+            images: req.body.subGalleries[i].images.map((img) => img._id),
+            fi: req.body.subGalleries[i].fi,
+            en: req.body.subGalleries[i].en,
+            so: req.body.subGalleries[i].so,
+          }
+        );
         for (let j = 0; j < req.body.subGalleries[i].images.length; j++) {
-          // update images
-          Image.update(
+          await Image.update(
             { _id: req.body.subGalleries[i].images[j]._id },
             {
               so: req.body.subGalleries[i].images[j].so,
               alt_fi: req.body.subGalleries[i].images[j].alt_fi,
               alt_en: req.body.subGalleries[i].images[j].alt_en,
-            },
-            (err, doc) => {
-              if (err) {
-                return res
-                  .status(501)
-                  .json({ message: "Error on saving record to database." });
-              }
+              gallery: req.body.subGalleries[i]._id,
             }
           );
         }
