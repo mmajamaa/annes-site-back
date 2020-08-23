@@ -20,15 +20,15 @@ schema.pre("remove", async function (next) {
   try {
     const imageIds = this.images.map((image) => image._id);
     const images = await Image.find({ _id: imageIds });
-    const imgKeyObjs = images.map((img) => {
-      return { Key: img.Key };
-    });
-
-    await Image.deleteMany({
-      _id: imageIds,
-    });
-
-    deleteImages(imgKeyObjs);
+    if (images.length > 0) {
+      await Image.deleteMany({
+        _id: imageIds,
+      });
+      const imgKeyObjs = images.map((img) => {
+        return { Key: img.Key };
+      });
+      deleteImages(imgKeyObjs);
+    }
     next();
   } catch (err) {
     console.log(err);
