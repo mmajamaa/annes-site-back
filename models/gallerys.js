@@ -28,7 +28,7 @@ schema.pre("remove", async function (next) {
       _id: imageIds,
     });
 
-    await deleteImages(imgKeyObjs);
+    deleteImages(imgKeyObjs);
     next();
   } catch (err) {
     console.log(err);

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const deleteImage = require("../services/images").deleteImage;
 
 let schema = new Schema({
-  Key: String, // used as a common id in S3 and DB
+  Key: String,
   url: { type: String, require: true },
   alt_fi: { type: String, require: true },
   alt_en: { type: String, require: true },
@@ -16,7 +16,7 @@ let schema = new Schema({
 });
 
 schema.pre("remove", async function (next) {
-  await deleteImage(this.Key);
+  deleteImage(this.Key);
   next();
 });
 

@@ -36,7 +36,7 @@ const upload = multer({
   }),
 });
 
-const singleUpload = (req, res, next) => {
+const singleUpload = async (req, res, next) => {
   const body = JSON.parse(req.body);
 
   buf = new Buffer(
@@ -48,7 +48,7 @@ const singleUpload = (req, res, next) => {
   let production = process.env.NODE_ENV === "production";
   let bucket = process.env.BUCKET;
 
-  var data = {
+  var params = {
     Bucket: bucket,
     Key: key,
     Body: buf,
@@ -56,52 +56,51 @@ const singleUpload = (req, res, next) => {
     ContentType: "image/jpeg",
     ACL: production ? "public-read" : "",
   };
-  s3.putObject(data, function (err, data) {
-    if (err) {
-      console.log(err);
-      console.log("Error uploading data: ", data);
-    } else {
-      console.log("succesfully uploaded the image!");
 
-      if (!production) {
-        res.locals.url = helpers.signUrl(key);
-      } else {
-        res.locals.url = `https://${bucket}.s3.eu-north-1.amazonaws.com/${key}`; // TODO: change to more dynamic;
-      }
+  try {
+    const data = await s3.putObject(params).promise();
 
-      res.locals.key = key;
-      res.locals.alt_fi = body.alt_fi;
-      res.locals.alt_en = body.alt_en;
-      next();
-    }
-  });
+    console.log("succesfully uploaded the image!");
+
+    res.locals.url = production
+      ? `https://${bucket}.s3.eu-north-1.amazonaws.com/${key}`
+      : helpers.signUrl(key);
+
+    res.locals.key = key;
+    res.locals.alt_fi = body.alt_fi;
+    res.locals.alt_en = body.alt_en;
+    next();
+  } catch (error) {
+    console.log(error);
+    console.log("Error uploading the image.");
+    next(error);
+  }
 };
 
-const deleteImage = (file) => {
-  s3.deleteObject(
-    {
-      Bucket: process.env.BUCKET,
-      Key: file,
-    },
-    (error, data) => {
-      if (error) console.log(error, error.stack);
-    }
-  );
+const deleteImage = async (file) => {
+  try {
+    await s3
+      .deleteObject({
+        Bucket: process.env.BUCKET,
+        Key: file,
+      })
+      .promise();
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-const deleteImages = (files) => {
-  s3.deleteObjects(
-    {
+const deleteImages = async (files) => {
+  try {
+    s3.deleteObjects({
       Bucket: process.env.BUCKET,
       Delete: {
         Objects: files,
       },
-    },
-    function (error, data) {
-      if (error) console.log(error, error.stack);
-      else console.log("delete", data);
-    }
-  );
+    }).promise();
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 module.exports = { upload, deleteImage, deleteImages, singleUpload };
