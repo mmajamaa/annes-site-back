@@ -3,7 +3,7 @@ const Image = require("../models/images");
 const Gallery = require("../models/gallerys");
 
 module.exports = {
-  index: async (req, res, next) => {
+  getGalleries: async (req, res, next) => {
     try {
       let docs = await Gallery.find().sort({ so: 0 }).populate("images");
       return res.status(200).json(docs);
@@ -43,7 +43,7 @@ module.exports = {
     }
   },
 
-  updateGalleries: async (req, res, next) => {
+  putGalleries: async (req, res, next) => {
     try {
       for (let i = 0; i < req.body.subGalleries.length; i++) {
         await Gallery.update(

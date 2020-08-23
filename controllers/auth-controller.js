@@ -4,7 +4,7 @@ const helpers = require("./helpers");
 const User = require("../models/users");
 
 module.exports = {
-  index: async (req, res, next) => {
+  login: async (req, res, next) => {
     const username = req.body.username;
     const password = req.body.password;
 

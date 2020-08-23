@@ -1,10 +1,9 @@
 const Image = require("../models/images");
 const Gallery = require("../models/gallerys");
-const deleteImage = require("../services/images").deleteImage;
 const helpers = require("./helpers/index");
 
 module.exports = {
-  index: async (req, res, next) => {
+  getImages: async (req, res, next) => {
     let images = await Image.find().sort({ so: 0 }).populate("gallery");
 
     try {
@@ -14,7 +13,7 @@ module.exports = {
     }
   },
 
-  newImage: async (req, res, next) => {
+  postImage: async (req, res, next) => {
     try {
       const image = await Image.findOne({ gallery: req.params.galleryId }).sort(
         "-so"
@@ -57,7 +56,7 @@ module.exports = {
     }
   },
 
-  saveOrder: async (req, res, next) => {
+  putImages: async (req, res, next) => {
     const images = req.body.images;
     for (let i = 0; i < images.length; i++) {
       Image.update(
