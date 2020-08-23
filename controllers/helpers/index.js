@@ -23,6 +23,16 @@ module.exports = {
     });
   },
 
+  verifyAdmin: (req, res, next) => {
+    let token = req.query.token;
+    jwt.verify(token, process.env.SECRET, (err, tokendata) => {
+      if (err || !tokendata.admin) {
+        return res.status(400).json({ message: "Unauthorized request" });
+      }
+      next();
+    });
+  },
+
   signUrl: (objKey) => {
     let url = `https://d25i4fwd261ujo.cloudfront.net/${objKey}`; // TODO: change to more dynamic;
 

@@ -8,12 +8,12 @@ const singleUpload = require("../services/images").singleUpload;
 router
   .route("/")
   .get(imageController.getImages)
-  .put(helpers.verifyToken, imageController.putImages);
+  .put(helpers.verifyAdmin, imageController.putImages);
 
 router
   .route("/:galleryId")
-  .post(helpers.verifyToken, singleUpload, imageController.postImage);
+  .post(helpers.verifyAdmin, singleUpload, imageController.postImage);
 
-router.route("/:id").delete(helpers.verifyToken, imageController.deleteImage);
+router.route("/:id").delete(helpers.verifyAdmin, imageController.deleteImage);
 
 module.exports = router;

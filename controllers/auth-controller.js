@@ -15,9 +15,13 @@ module.exports = {
       if (doc) {
         if (doc.isValid(password)) {
           // generate token
-          let token = jwt.sign({ username }, process.env.SECRET, {
-            expiresIn: "3d",
-          });
+          let token = jwt.sign(
+            { username, admin: doc.admin },
+            process.env.SECRET,
+            {
+              expiresIn: "3d",
+            }
+          );
           console.log("succesful login");
           return res.status(200).json({ username, token });
         } else {
@@ -34,14 +38,11 @@ module.exports = {
   },
 
   register: async (req, res, next) => {
-    // TODO: REMOVE AS NEEDED
-    return;
-    let user = new User({
-      username: req.body.username,
-      password: User.hashPassword(req.body.password),
-    });
-
     try {
+      let user = new User({
+        username: req.body.username,
+        password: User.hashPassword(req.body.password),
+      });
       let doc = await user.save();
       return res.status(201).json(doc);
     } catch (error) {

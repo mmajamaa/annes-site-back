@@ -7,11 +7,11 @@ const helpers = require("../controllers/helpers");
 router
   .route("/")
   .get(galleryController.getGalleries)
-  .post(helpers.verifyToken, galleryController.postGallery)
-  .put(helpers.verifyToken, galleryController.putGalleries);
+  .post(helpers.verifyAdmin, galleryController.postGallery)
+  .put(helpers.verifyAdmin, galleryController.putGalleries);
 
 router
   .route("/:id")
-  .delete(helpers.verifyToken, galleryController.deleteGallery);
+  .delete(helpers.verifyAdmin, galleryController.deleteGallery);
 
 module.exports = router;

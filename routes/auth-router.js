@@ -6,7 +6,7 @@ const helpers = require("../controllers/helpers");
 
 router.route("/login").post(authController.login);
 
-router.route("/register").post(authController.register);
+router.route("/register").post(helpers.verifyAdmin, authController.register);
 
 router.route("/status").get(helpers.verifyToken, authController.authenticated);
 
