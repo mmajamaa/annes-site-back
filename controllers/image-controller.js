@@ -52,18 +52,14 @@ module.exports = {
   },
 
   putImages: async (req, res, next) => {
-    const images = req.body.images;
     try {
+      const images = req.body.images;
       for (let i = 0; i < images.length; i++) {
-        await Image.update(
-          { _id: images[i]._id },
-          {
-            so: images[i].so,
-            alt_fi: images[i].alt_fi,
-            alt_en: images[i].alt_en,
-            gallery: images[i].gallery,
-          }
-        );
+        let image = await Image.findById(images[i].id);
+        for (let key in images[i].changes) {
+          image[key] = images[i].changes[key];
+        }
+        await image.save()
       }
       return res.status(200).json({ message: "success" });
     } catch (error) {

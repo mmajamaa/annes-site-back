@@ -42,31 +42,13 @@ module.exports = {
   putGalleries: async (req, res, next) => {
     try {
       for (let i = 0; i < req.body.subGalleries.length; i++) {
-        await Gallery.update(
-          {
-            _id: req.body.subGalleries[i]._id,
-          },
-          {
-            images: req.body.subGalleries[i].images.map((img) => img._id),
-            fi: req.body.subGalleries[i].fi,
-            en: req.body.subGalleries[i].en,
-            so: req.body.subGalleries[i].so,
-          }
-        );
-        for (let j = 0; j < req.body.subGalleries[i].images.length; j++) {
-          await Image.update(
-            { _id: req.body.subGalleries[i].images[j]._id },
-            {
-              so: req.body.subGalleries[i].images[j].so,
-              alt_fi: req.body.subGalleries[i].images[j].alt_fi,
-              alt_en: req.body.subGalleries[i].images[j].alt_en,
-              gallery: req.body.subGalleries[i]._id,
-            }
-          );
+        let gallery = await Gallery.findById(req.body.subGalleries[i].id);
+        for (let key in req.body.subGalleries[i].changes) {
+          gallery[key] = req.body.subGalleries[i].changes[key];
         }
+        await gallery.save();
       }
-      let docs = await Gallery.find().sort({ so: 0 }).populate("images");
-      return res.status(201).json(docs);
+      return res.status(201).json();
     } catch (error) {
       return res.status(501).json({ message: "Error updating changes." });
     }
