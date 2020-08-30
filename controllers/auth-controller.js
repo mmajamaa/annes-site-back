@@ -12,8 +12,7 @@ module.exports = {
 
     try {
       let doc = await User.findOne({ username }).exec();
-      if (doc) {
-        if (doc.isValid(password)) {
+      if (doc && doc.isValid(password)) {
           // generate token
           let token = jwt.sign(
             { username, admin: doc.admin },
@@ -24,13 +23,9 @@ module.exports = {
           );
           console.log("succesful login");
           return res.status(200).json({ username, token });
-        } else {
-          console.log("invalid pw");
-          return res.status(501).json({ message: "Invalid password." });
-        }
       } else {
-        console.log("wrong username");
-        return res.status(501).json({ message: "Wrong username." });
+        console.log("wrong credentials");
+        return res.status(401).json({ message: "Wrong credentials." });
       }
     } catch (error) {
       res.status(501).json({ message: "Some internal error" });
