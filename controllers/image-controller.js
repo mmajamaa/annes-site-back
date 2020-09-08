@@ -1,6 +1,5 @@
 const Image = require("../models/images");
 const Gallery = require("../models/gallerys");
-const helpers = require("./helpers/index");
 
 module.exports = {
   getImages: async (req, res, next) => {

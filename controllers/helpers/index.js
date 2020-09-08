@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const cfsign = require("aws-cloudfront-sign");
 const aws = require("aws-sdk");
 
 aws.config.update({
@@ -31,20 +30,6 @@ module.exports = {
       }
       next();
     });
-  },
-
-  signUrl: (objKey) => {
-    let url = `https://d25i4fwd261ujo.cloudfront.net/${objKey}`; // TODO: change to more dynamic;
-
-    let signingParams = {
-      keypairId: process.env.CF_KEY_PAIR_ID,
-      privateKeyString: process.env.CF_PRIVATE_KEY,
-      expireTime: 1755507545000,
-    };
-
-    var signedUrl = cfsign.getSignedUrl(url, signingParams);
-
-    return signedUrl;
   },
 
   uploadSubGalleryJson: async (subGalleryData) => {
