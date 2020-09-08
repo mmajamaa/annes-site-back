@@ -84,13 +84,16 @@ const singleUpload = async (req, res, next) => {
 
 const deleteImage = async (file) => {
   try {
-    // TODO: check NODE_ENV
-    await s3
-      .deleteObject({
-        Bucket: process.env.BUCKET,
-        Key: file,
-      })
-      .promise();
+    if (process.env.NODE_ENV === "production") {
+      await s3
+        .deleteObject({
+          Bucket: process.env.BUCKET,
+          Key: file,
+        })
+        .promise();
+    } else {
+      await fs.unlink(path.join("public", "images", file)).promise()
+    }
   } catch (error) {
     console.log(error);
   }
