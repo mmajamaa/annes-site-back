@@ -49,4 +49,6 @@ app.use(bodyParser.text({ limit: "200mb" }));
 
 app.use("/api", apiRoutes);
 
+app.use(express.static('public'));
+
 app.listen(process.env.PORT || 4201);

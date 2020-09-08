@@ -1,3 +1,6 @@
+const fs = require("fs").promises;
+const path = require("path");
+
 const aws = require("aws-sdk");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
@@ -58,14 +61,18 @@ const singleUpload = async (req, res, next) => {
   };
 
   try {
-    const data = await s3.putObject(params).promise();
+    if (process.env.NODE_ENV === "production") {
+      await s3.putObject(params).promise();
+    } else {
+      await fs.writeFile(path.join("public", "images", key), buf)
+    }
 
     console.log("succesfully uploaded the image!");
 
     res.locals.url = production
-      ? `https://${bucket}.s3.eu-north-1.amazonaws.com/${key}`
-      : helpers.signUrl(key);
-
+      ? `https://${bucket}.s3.eu-north-1.amazonaws.com/${key}` :
+      `http://www.localhost:4201/images/${key}`;
+      
     res.locals.key = key;
     res.locals.alt_fi = body.alt_fi;
     res.locals.alt_en = body.alt_en;
@@ -79,6 +86,7 @@ const singleUpload = async (req, res, next) => {
 
 const deleteImage = async (file) => {
   try {
+    // TODO: check NODE_ENV
     await s3
       .deleteObject({
         Bucket: process.env.BUCKET,
@@ -91,6 +99,7 @@ const deleteImage = async (file) => {
 };
 
 const deleteImages = async (files) => {
+  // TODO: check NODE_ENV
   try {
     s3.deleteObjects({
       Bucket: process.env.BUCKET,
