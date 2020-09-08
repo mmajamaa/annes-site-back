@@ -21,7 +21,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// not used right now, replaced with upload below to apply compression of images
+// NOTE: not used right now, replaced with upload below to apply compression of images
 const upload = multer({
   fileFilter,
   storage: multerS3({
@@ -86,13 +86,13 @@ const deleteImage = async (file) => {
   try {
     if (process.env.NODE_ENV === "production") {
       await s3
-        .deleteObject({
-          Bucket: process.env.BUCKET,
-          Key: file,
-        })
-        .promise();
+      .deleteObject({
+        Bucket: process.env.BUCKET,
+        Key: file,
+      })
+      .promise();
     } else {
-      await fs.unlink(path.join("public", "images", file)).promise()
+      await fs.unlink(path.join("public", "images", file))
     }
   } catch (error) {
     console.log(error);
@@ -100,14 +100,19 @@ const deleteImage = async (file) => {
 };
 
 const deleteImages = async (files) => {
-  // TODO: check NODE_ENV
   try {
-    s3.deleteObjects({
-      Bucket: process.env.BUCKET,
-      Delete: {
-        Objects: files,
-      },
-    }).promise();
+    if (process.env.NODE_ENV === "production") {
+      s3.deleteObjects({
+        Bucket: process.env.BUCKET,
+        Delete: {
+          Objects: files,
+        },
+      }).promise();
+    } else {
+      for (let i = 0; i < files.length; i++) {
+        await fs.unlink(path.join("public", "images", files[i].Key))
+      }
+    }
   } catch (error) {
     console.log(error);
   }
