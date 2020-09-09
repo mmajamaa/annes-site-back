@@ -1,3 +1,6 @@
+const fs = require("fs").promises;
+const path = require("path");
+
 const jwt = require("jsonwebtoken");
 const aws = require("aws-sdk");
 
@@ -35,18 +38,21 @@ module.exports = {
   uploadSubGalleryJson: async (subGalleryData) => {
     const bucket = process.env.BUCKET;
     const key = "sub_gallery_data.json";
-    const production = process.env.NODE_ENV === "production";
 
     const params = {
       Bucket: bucket,
       Key: key,
       Body: JSON.stringify(subGalleryData),
       ContentType: "application/json",
-      ACL: production ? "public-read" : "",
+      ACL: "public-read"
     };
 
     try {
-      await s3.putObject(params).promise();
+      if (process.env.NODE_ENV === "production") {
+        await s3.putObject(params).promise();
+      } else {
+        await fs.writeFile(path.join("public", key), JSON.stringify(subGalleryData))
+      }
       console.log("Succesfully uploaded the sub gallery JSON.");
     } catch (error) {
       console.log(error);
