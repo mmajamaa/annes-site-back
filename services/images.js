@@ -2,8 +2,6 @@ const fs = require("fs").promises;
 const path = require("path");
 
 const aws = require("aws-sdk");
-const multer = require("multer");
-const multerS3 = require("multer-s3");
 
 aws.config.update({
   secretAccessKey: process.env.AWS_SECRET_ACCESS,
@@ -12,30 +10,6 @@ aws.config.update({
 });
 
 const s3 = new aws.S3();
-
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-    cb(null, true);
-  } else {
-    cb(new Error("Invalid Mime Type, only JPEG and PNG"), false);
-  }
-};
-
-// NOTE: not used right now, replaced with upload below to apply compression of images
-const upload = multer({
-  fileFilter,
-  storage: multerS3({
-    s3,
-    bucket: process.env.BUCKET,
-    acl: "public-read",
-    metadata: function (req, file, cb) {
-      cb(null, { fieldName: "TESTING" });
-    },
-    key: function (req, file, cb) {
-      cb(null, Date.now().toString());
-    },
-  }),
-});
 
 const singleUpload = async (req, res, next) => {
   const body = JSON.parse(req.body);
@@ -118,4 +92,4 @@ const deleteImages = async (files) => {
   }
 };
 
-module.exports = { upload, deleteImage, deleteImages, singleUpload };
+module.exports = { deleteImage, deleteImages, singleUpload };
