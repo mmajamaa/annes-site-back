@@ -13,27 +13,27 @@ const s3 = new aws.S3();
 
 module.exports = {
   singleUpload: async (req, res, next) => {
-    const body = JSON.parse(req.body);
-  
-    buf = new Buffer(
-      body.image.replace(/^data:image\/\w+;base64,/, ""),
-      "base64"
-    );
-  
-    const key = Date.now().toString();
-    let production = process.env.NODE_ENV === "production";
-    let bucket = process.env.BUCKET;
-  
-    var params = {
-      Bucket: bucket,
-      Key: key,
-      Body: buf,
-      ContentEncoding: "base64",
-      ContentType: "image/jpeg",
-      ACL: production ? "public-read" : "",
-    };
-  
     try {
+      const body = JSON.parse(req.body);
+  
+      buf = new Buffer(
+        body.image.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+    
+      const key = Date.now().toString();
+      let production = process.env.NODE_ENV === "production";
+      let bucket = process.env.BUCKET;
+    
+      var params = {
+        Bucket: bucket,
+        Key: key,
+        Body: buf,
+        ContentEncoding: "base64",
+        ContentType: "image/jpeg",
+        ACL: production ? "public-read" : "",
+      };
+
       if (process.env.NODE_ENV === "production") {
         await s3.putObject(params).promise();
       } else {
