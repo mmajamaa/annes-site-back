@@ -12,8 +12,9 @@
   "license": "ISC",
   "devDependencies": {
     "chai": "*",
-    "mocha": "*",
     "dotenv": "^8.2.0",
+    "mocha": "*",
+    "sinon": "^9.0.3",
     "ts-node-dev": "^1.0.0-pre.59"
   },
   "dependencies": {
